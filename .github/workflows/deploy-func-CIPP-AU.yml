@@ -1,35 +1,49 @@
 name: Build and deploy PowerShell project to Azure Function App - func-CIPP-AU
 
+# Note: This workflow differs significantly from the existing cippiqldy deployment workflow.
+# The original workflow used publish-profile authentication via Azure/functions-action@v1
+# which relies on SCM/Kudu for deployment. Flex Consumption plan does not support SCM/Kudu
+# deployment — it deploys via a storage container instead. Publish profile authentication
+# returns 401 Unauthorized on Flex Consumption regardless of credential validity.
+# Azure CLI zip deployment is the supported method for Flex Consumption on Linux.
+# Reference: https://learn.microsoft.com/en-us/azure/azure-functions/flex-consumption-how-to
+
 on:
   push:
     branches:
       - master-au
   workflow_dispatch:
 
-env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout GitHub Action'
+      - name: Checkout GitHub Action
         uses: actions/checkout@v4
-      - name: 'Run Azure Functions Action'
-        uses: Azure/functions-action@v1
-        id: fa
+
+      - name: Login to Azure
+        uses: azure/login@v2
         with:
-          app-name: 'func-CIPP-AU'
-          slot-name: 'Production'
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_CIPP_AU }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Package and deploy to Function App
+        run: |
+          zip -r deployment.zip . -x "*.git*"
+          az functionapp deployment source config-zip \
+            --name func-CIPP-AU \
+            --resource-group CIPP-AU \
+            --src deployment.zip
 
 
 
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-# Previous Deployment
+
+
+######### Previous Deployment ##############
 # name: Build and deploy Powershell project to Azure Function App - cippiqldy
 
 # on:
