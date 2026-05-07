@@ -36,7 +36,7 @@ jobs:
         run: |
           zip -r deployment.zip . -x "*.git*"
           az functionapp deployment source config-zip \
-            --name func-CIPP-AU \
+            --name cippau \
             --resource-group CIPP-AU \
             --src deployment.zip
 
