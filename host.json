@@ -9,8 +9,9 @@
   },
   "functionTimeout": "00:10:00",
   "logging": {
-  "logLevel": {
+    "logLevel": {
     "default": "Warning"
+    }    
   "extensions": {
     "durableTask": {
       "maxConcurrentActivityFunctions": 3,
