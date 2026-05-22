@@ -1,7 +1,7 @@
 version: "1"
 rules:
   #- base: master
-  - base: master-au
+  - base: master
     upstream: KelvinTegelaar:master
     mergeMethod: merge
   # Comment out dev
