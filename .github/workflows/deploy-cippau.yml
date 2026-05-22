@@ -11,7 +11,7 @@ name: Build and deploy PowerShell project to Azure Function App - func-CIPP-AU
 on:
   push:
     branches:
-      - master-au
+      - master
   workflow_dispatch:
 
 permissions:
